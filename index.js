@@ -5,7 +5,7 @@ let humanScore = 0;
 let computerScore = 0;
 
 
-function alertMessage(message) {
+function alertPressStart(message) {
     const alertBox = document.createElement('div');
     alertBox.innerHTML = message;
     alertBox.style.fontFamily = 'Arial';
@@ -21,7 +21,6 @@ function alertMessage(message) {
     alertBox.style.top = '50%';
     alertBox.style.left = '50%';
     alertBox.style.transform = 'translate(-50%, -50%)';
-    alertBox.style.zIndex = '1000'; // Ensure it appears above other content
     setTimeout(() => {
         alertBox.style.opacity = 1;
       }, 500);
@@ -35,7 +34,7 @@ function alertMessage(message) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    alertMessage('Please, press F12 or Option + ⌘ + I to start the game.');
+    alertPressStart('Please, press F12 or Option + ⌘ + I to start the game.');
 });
 
 
@@ -50,6 +49,13 @@ function startNewGame() {
 }
 
 
+// Function to check if the console is open
+function isConsoleOpen() {
+    const devtools = /./; // A regular expression that matches anything
+    console.log(devtools); // Attempt to log something to check if console is open
+    return true; // Return true since we assume the function is called when the console is open
+}
+
 document.addEventListener("keydown", function(event) {
     if (event.key === 'F12' || (event.key ===  'i' && event.metaKey && event.altKey)) {
         setTimeout(() => {
@@ -58,20 +64,10 @@ document.addEventListener("keydown", function(event) {
                 setTimeout(() => {
                     startNewGame();
                 }, 2000);
-            } else {
-                console.log('%cPlease open the console to start the game.', 'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-            }
-        }, 500); // Wait for 1 second (1000 milliseconds)
+            } 
+        }, 500); // Wait for 1 second
     }
 });
-
-// Function to check if the console is open
-function isConsoleOpen() {
-    // This method is a workaround to check for console open
-    const devtools = /./; // A regular expression that matches anything
-    console.log(devtools); // Attempt to log something to check if console is open
-    return true; // Return true since we assume the function is called when the console is open
-}
 
 
 function getComputerChoice() {
@@ -80,9 +76,10 @@ function getComputerChoice() {
     return choice;
 }
 
+
 function getHumanChoice() {
     let input = prompt("Enter Rock, Paper, or Scissors");
-    if (input !== null) {
+    if (input !== null && input.trim() !== "") {
         input = input.toLowerCase();
         console.log('%cThe player chose: ' + input, 'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
         return input.charAt(0).toUpperCase() + input.slice(1); // Capitalizes the first letter
@@ -94,43 +91,22 @@ function getHumanChoice() {
 function playRound(humanChoice, computerChoice) {
     if (humanChoice === computerChoice) {
         console.log('%cThis round is a draw.', 'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-    } else if (humanChoice === "Rock") {
-        if (computerChoice === "Scissors") {
-            humanScore += 1;
-            console.log(`%cThe player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
-                'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
+    } else if (humanChoice === "Rock" && computerChoice === "Scissors" ||
+              humanChoice === "Scissors" && computerChoice === "Paper" ||
+              humanChoice === "Paper" && computerChoice === "Rock") {
+                 humanScore += 1;
+                    console.log(`%cThe player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
+                    'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
         } else {
             computerScore += 1;
             console.log(`%cThe computer wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
                 'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-        }
-    } else if (humanChoice === "Paper") {
-        if (computerChoice === "Rock") {
-            humanScore += 1;
-            console.log(`%cThe player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
-                'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-        } else {
-            computerScore += 1;
-            console.log(`%cThe computer wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
-                'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-        }
-    } else if (humanChoice === "Scissors") {
-        if (computerChoice === "Paper") {
-            humanScore += 1;
-            console.log(`%cThe player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
-                'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-        } else {
-            computerScore += 1;
-            console.log(`%cThe computer wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`,
-                'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
-        }
-    }
-    
+            }
     rounds += 1; // Increment rounds after a complete round
 }
 
 
-function maxRounds() {
+function maxRounds(humanChoice, computerChoice) {
     if (rounds === 5) {
       console.log(`Final Scores - Player: ${humanScore}, Computer: ${computerScore}`);
       if (humanScore > computerScore) {
@@ -142,18 +118,27 @@ function maxRounds() {
       } setTimeout(() => {
         console.clear();
          }, 2000);
+         setTimeout(() => {
+            console.log('%cStarting a new game...', 'color: blue; font-size: 20px; background-color: yellow; padding: 4px;');
+        }, 2000);
+         setTimeout(() => {
+            startNewGame();
+        }, 4000);
       }
   }
-
 
 
 function playGame() {
     while (rounds < 5) {
         let humanChoice = getHumanChoice();
-        if (humanChoice) { // Proceed only if a choice was made
+        if (!humanChoice) {
+            console.log('%cGame stopped by the player.', 'color: red; font-size: 20px; background-color: black; padding: 4px;');
+            break; // Exit the loop and stop the game
+        }
+        else if (humanChoice) { // Proceed only if a choice was made
             let computerChoice = getComputerChoice();
             playRound(humanChoice, computerChoice);
-            maxRounds(); 
-        }
+            maxRounds(humanChoice, computerChoice);
+        } 
     }
 }
