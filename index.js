@@ -1,104 +1,114 @@
-
 const choices = ["Rock", "Paper", "Scissors"];
 let rounds = 0;
 let humanScore = 0;
 let computerScore = 0;
 
-const results = document.querySelector('#results') 
-const score = document.querySelector('#score')
+const results = document.querySelector('#results');
+const score = document.querySelector('#score');
+const rock = document.querySelector('#rock');
+const paper = document.querySelector('#paper');
+const scissors = document.querySelector('#scissors');
 
-
-
-
+// Add event listeners for buttons
 rock.addEventListener("click", function() { 
-    playerChoice("Rock");
+    getPlayerChoice("Rock");
 });
 
 paper.addEventListener("click", function() { 
-    playerChoice("Paper");
+    getPlayerChoice("Paper");
 });
 
 scissors.addEventListener("click", function() { 
-    playerChoice("Scissors");
+    getPlayerChoice("Scissors");
 });
 
-
 function startNewGame() {
-    // Reset for a new game
     rounds = 0;
     humanScore = 0;
     computerScore = 0;
+    score.textContent = ''; 
+    results.textContent = ''; 
 }
-
 
 function getComputerChoice() {
-   let choice = choices[Math.floor(Math.random() * choices.length)];
-    return choice;
+    return choices[Math.floor(Math.random() * choices.length)];
 }
 
-function playerChoice (humanChoice) {
+function getPlayerChoice(humanChoice) {
     const computerChoice = getComputerChoice();
-    playRound(humanChoice, computerChoice);
-} 
 
-function getFinalScore (humanChoice, computerChoice) {
-    let scoreMessage;
+    // Clear previous results
+    results.textContent = ''; 
+
+    // Display computer choice
+    const computerChoiceText = document.createElement('p');
+    computerChoiceText.textContent = `Computer chose: ${computerChoice}`;
+    results.appendChild(computerChoiceText);
+
+    // Display player choice
+    const playerChoiceText = document.createElement('p');
+    playerChoiceText.textContent = `The player chose: ${humanChoice}`;
+    results.appendChild(playerChoiceText);
+
+    playRound(humanChoice, computerChoice); 
+}
+
+function getFinalScore() {
+    let scoreMessage = `Final Scores - Player: ${humanScore}, Computer: ${computerScore}`;
     
-    if (rounds === 5) {
-      scoreMessage = `Final Scores - Player: ${humanScore}, Computer: ${computerScore}`;
-     if (humanScore > computerScore) {
+    if (humanScore > computerScore) {
         scoreMessage += '\nThe player wins the game!';
-      } else if (humanScore < computerScore) {
+    } else if (humanScore < computerScore) {
         scoreMessage += '\nThe computer wins the game!';
-      } else if (humanChoice === computerChoice) {
+    } else {
         scoreMessage += '\nThe game is a tie!';
-      } 
+    }
 
-      score.textContent = scoreMessage;
-      
-      score.style.color = "blue"; 
-      score.style.fontSize = "20px"; 
-      score.style.backgroundColor = "yellow"; 
-      score.style.padding = "4px";
+    score.textContent = scoreMessage;
 
-      setTimeout(() => {
+    // Style the score message
+    score.style.color = "blue"; 
+    score.style.fontSize = "20px"; 
+    score.style.backgroundColor = "yellow"; 
+    score.style.padding = "4px";
+
+    // Reset the game after displaying the final score
+    setTimeout(() => {
         results.textContent = '';
         score.textContent = 'Starting a new game...';
-        }, 1000);
-    
-       setTimeout(() => {
-            score.textContent = '';
-            startNewGame();
-        }, 3000);
+    }, 1000);
 
-
-      }
-    };
-
+    setTimeout(() => {
+        score.textContent = '';
+        startNewGame();
+    }, 3000);
+}
 
 function playRound(humanChoice, computerChoice) {
     let resultMessage;
+    
     if (humanChoice === computerChoice) {
         resultMessage = 'This round is a draw.';
-    } else if (humanChoice === "Rock" && computerChoice === "Scissors" ||
-              humanChoice === "Scissors" && computerChoice === "Paper" ||
-              humanChoice === "Paper" && computerChoice === "Rock") {
-                 humanScore += 1; 
-                 resultMessage = `The player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`;
-                } else {
-            computerScore += 1;
-            resultMessage = `The computer wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`;
-        }
-    
-        results.textContent = resultMessage;
+    } else if (
+        (humanChoice === "Rock" && computerChoice === "Scissors") ||
+        (humanChoice === "Scissors" && computerChoice === "Paper") ||
+        (humanChoice === "Paper" && computerChoice === "Rock")
+    ) {
+        humanScore += 1; 
+        resultMessage = `The player wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`;
+    } else {
+        computerScore += 1;
+        resultMessage = `The computer wins this round! The score is now: Player: ${humanScore} : Computer: ${computerScore}`;
+    }
 
-        results.style.color = "blue"; 
-        results.style.fontSize = "20px"; 
-        results.style.backgroundColor = "yellow"; 
-        results.style.padding = "4px";
-    
-    rounds += 1; // Increment rounds after a complete round
+    // Create a new paragraph for the round result
+    const roundResultText = document.createElement('p');
+    roundResultText.textContent = resultMessage;
+    results.appendChild(roundResultText);
 
-    if (rounds === 5) {getFinalScore(humanChoice, computerChoice);
+    rounds += 1; 
+
+    if (rounds === 5) {
+        getFinalScore();
     }
 }
